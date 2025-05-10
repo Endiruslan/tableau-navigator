@@ -82,25 +82,26 @@ export default function TableauSearchCommand() {
           setItems(results);
           setShowWelcome(false);
         }
-      } catch (err: any) {
+      } catch (err: Error | unknown) {
         if (!isCancelled) {
-          console.error("Error caught in fetchItems:", err.message);
-          setError(err);
+          console.error("Error caught in fetchItems:", err instanceof Error ? err.message : String(err));
+          setError(err instanceof Error ? err : new Error(String(err)));
 
+          const errorMessage = err instanceof Error ? err.message : String(err);
           const isAuthError =
-            err.message === PREFERENCES_MISSING_ERROR ||
-            err.message === AUTH_CREDENTIALS_MISSING_ERROR ||
-            err.message.includes("Authentication Failed") ||
-            err.message.includes("Signin Error") ||
-            err.message.includes("401") ||
-            err.message.includes("auth") ||
-            err.message.includes("token");
+            errorMessage === PREFERENCES_MISSING_ERROR ||
+            errorMessage === AUTH_CREDENTIALS_MISSING_ERROR ||
+            errorMessage.includes("Authentication Failed") ||
+            errorMessage.includes("Signin Error") ||
+            errorMessage.includes("401") ||
+            errorMessage.includes("auth") ||
+            errorMessage.includes("token");
 
           if (isAuthError) {
-            console.log("Authentication error detected:", err.message);
+            console.log("Authentication error detected:", errorMessage);
             await LocalStorage.removeItem("tableauSessionToken");
             await LocalStorage.removeItem("tableauActualSiteId");
-            setConnectionErrorMessage(err.message);
+            setConnectionErrorMessage(errorMessage);
             setShowWelcome(true);
           }
         }

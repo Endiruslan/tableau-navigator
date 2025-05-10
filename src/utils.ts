@@ -95,9 +95,9 @@ export async function getTableauAuthToken(): Promise<{ token: string; siteLuid: 
           const errorData = (await response.json()) as { error: ApiError };
           console.error("Tableau Auth Error JSON:", JSON.stringify(errorData, null, 2));
           errorDetail = `${errorData.error.summary} (Code: ${errorData.error.code}) - Detail: ${errorData.error.detail}`;
-        } catch (e) {
+        } catch {
           errorDetail = `Status: ${response.status} - ${response.statusText}. Could not parse error response.`;
-          console.error("Could not parse Tableau Auth Error response:", e);
+          console.error("Could not parse Tableau Auth Error response:");
         }
 
         // Save error message
@@ -199,7 +199,7 @@ async function tableauApiRequest<T>(endpoint: string, method: "GET" | "POST" = "
           const errorData = (await response.json()) as { error: ApiError };
           console.error("Tableau API Error JSON:", JSON.stringify(errorData, null, 2));
           errorDetail = `${errorData.error.summary} (Code: ${errorData.error.code}) - Detail: ${errorData.error.detail}`;
-        } catch (e) {
+        } catch {
           errorDetail = `Status: ${response.status} - ${response.statusText}. Could not parse error response.`;
           console.error("Could not parse Tableau API Error response:", await response.text());
         }
@@ -447,8 +447,8 @@ export async function getItemUrl(item: TableauView | TableauWorkbook): Promise<s
     const workbook = item as TableauWorkbook;
 
     // Check if we have the direct webpageUrl from the API
-    if ((workbook as any).webpageUrl) {
-      return (workbook as any).webpageUrl;
+    if ("webpageUrl" in workbook && typeof workbook.webpageUrl === "string") {
+      return workbook.webpageUrl;
     }
 
     if (!workbook.contentUrl && !workbook.id) {
@@ -462,13 +462,13 @@ export async function getItemUrl(item: TableauView | TableauWorkbook): Promise<s
     const view = item as TableauView;
 
     // Check if we have the direct webpageUrl from the API
-    if ((view as any).webpageUrl) {
-      return (view as any).webpageUrl;
+    if ("webpageUrl" in view && typeof view.webpageUrl === "string") {
+      return view.webpageUrl;
     }
 
     // For views we need to get the workbook's contentUrl and the view's viewUrlName
     let workbookContentUrl = view.workbook?.contentUrl;
-    let viewName = view.viewUrlName;
+    const viewName = view.viewUrlName;
 
     // If the view doesn't have workbook.contentUrl but has its own contentUrl
     // Example: contentUrl = "MainVIPDashboard/sheets/MainVIPDashboard"
