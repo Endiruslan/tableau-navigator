@@ -158,7 +158,9 @@ export default function TableauSearchCommand() {
         }
       } catch (error) {
         console.error("Error checking initial config:", error);
-        setConnectionErrorMessage("Error checking configuration: " + (error instanceof Error ? error.message : "Unknown error"));
+        setConnectionErrorMessage(
+          "Error checking configuration: " + (error instanceof Error ? error.message : "Unknown error"),
+        );
         setShowWelcome(true);
         setIsLoading(false);
       }
@@ -194,10 +196,10 @@ export default function TableauSearchCommand() {
             error.message === PREFERENCES_MISSING_ERROR
               ? "Server URL or API Version missing. Please update your settings in Extension Preferences."
               : error.message === AUTH_CREDENTIALS_MISSING_ERROR
-              ? "Personal Access Token credentials are missing. Please update your settings in Extension Preferences."
-              : error.message.includes("Authentication Failed") || error.message.includes("Signin Error")
-              ? `Failed to authenticate with your Tableau server. Please check and update your credentials.\n\nError details: ${error.message}\n\nCommon issues:\n- Incorrect Personal Access Token name or secret\n- Invalid server URL\n- Network connectivity problems\n- PAT permissions insufficient`
-              : `${error.message}\n\nIf this is an authentication issue, please update your settings in Extension Preferences.`
+                ? "Personal Access Token credentials are missing. Please update your settings in Extension Preferences."
+                : error.message.includes("Authentication Failed") || error.message.includes("Signin Error")
+                  ? `Failed to authenticate with your Tableau server. Please check and update your credentials.\n\nError details: ${error.message}\n\nCommon issues:\n- Incorrect Personal Access Token name or secret\n- Invalid server URL\n- Network connectivity problems\n- PAT permissions insufficient`
+                  : `${error.message}\n\nIf this is an authentication issue, please update your settings in Extension Preferences.`
           }
           icon={Icon.ExclamationMark}
           actions={
@@ -208,24 +210,33 @@ export default function TableauSearchCommand() {
                 icon={Icon.Gear}
                 shortcut={{ modifiers: ["cmd"], key: "," }}
               />
-              <Action title="Retry" onAction={triggerRefresh} icon={Icon.Repeat} shortcut={{ modifiers: ["cmd"], key: "r" }} />
+              <Action
+                title="Retry"
+                onAction={triggerRefresh}
+                icon={Icon.Repeat}
+                shortcut={{ modifiers: ["cmd"], key: "r" }}
+              />
             </ActionPanel>
           }
         />
       )}
       {!error && !isLoading && items.length === 0 && (
-        <List.EmptyView title="No Results" description={searchText ? "No items match your search." : "No dashboards or charts found."} />
+        <List.EmptyView
+          title="No Results"
+          description={searchText ? "No items match your search." : "No dashboards or charts found."}
+        />
       )}
       {items.map((item) => (
         <List.Item
           key={item.id}
           title={item.name}
-          subtitle={item.itemType === "Workbook" ? `Project: ${item.project?.name ?? "Unknown"}` : `Workbook: ${item.workbook?.name ?? "Unknown"}`}
+          subtitle={
+            item.itemType === "Workbook"
+              ? `Project: ${item.project?.name ?? "Unknown"}`
+              : `Workbook: ${item.workbook?.name ?? "Unknown"}`
+          }
           icon={item.itemType === "Workbook" ? Icon.Box : Icon.LineChart}
-          accessories={[
-            { tag: item.itemType },
-            { date: new Date(item.updatedAt), tooltip: "Last Updated" },
-          ]}
+          accessories={[{ tag: item.itemType }, { date: new Date(item.updatedAt), tooltip: "Last Updated" }]}
           actions={
             <ActionPanel>
               <Action
