@@ -29,7 +29,8 @@
   "scripts": {
     "build": "ray build",
     "dev": "ray develop",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx",
+    "publish": "npx @raycast/api@latest publish"
   },
   "preferences": [
     {
